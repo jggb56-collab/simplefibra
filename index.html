@@ -1,0 +1,256 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>WorkFlow Pro C5</title>
+    
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <meta name="apple-mobile-web-app-title" content="WorkFlow C5">
+    <link rel="apple-touch-icon" href="https://cdn-icons-png.flaticon.com/512/5943/5943970.png">
+    
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        body { background-color: #0f172a; color: #f8fafc; font-family: system-ui, sans-serif; -webkit-tap-highlight-color: transparent; }
+        .glass-card { background: rgba(30, 41, 59, 0.7); backdrop-filter: blur(10px); border: 1px solid rgba(255,255,255,0.1); }
+        .btn-install { background: linear-gradient(135deg, #0ea5e9 0%, #2563eb 100%); }
+        .btn-repair { background: linear-gradient(135deg, #f59e0b 0%, #d97706 100%); }
+        .btn-inv { background: linear-gradient(135deg, #6366f1 0%, #4338ca 100%); }
+        .btn-gold { background: linear-gradient(135deg, #fbbf24 0%, #b45309 100%); }
+        input { 
+            background: #1e293b !important; border: 1px solid #334155 !important; color: white !important; 
+            padding: 10px !important; border-radius: 12px !important; width: 100%; outline: none; font-size: 14px;
+        }
+        .label-style { text-transform: uppercase; font-size: 9px; font-weight: bold; color: #94a3b8; margin-bottom: 2px; display: block; }
+    </style>
+</head>
+<body class="p-4 max-w-lg mx-auto pb-24">
+
+    <header class="flex justify-between items-center py-4">
+        <div>
+            <h1 class="text-2xl font-black text-sky-500 italic uppercase">WORKFLOW PRO</h1>
+            <p class="text-[9px] font-bold text-green-500 uppercase tracking-widest">● Sistema Operativo v4.2</p>
+        </div>
+    </header>
+
+    <div class="grid grid-cols-3 gap-2 mb-4">
+        <button onclick="abrirModal('modalInstalacion')" class="btn-install p-4 rounded-2xl shadow-lg flex flex-col items-center">
+            <span class="text-xl">🏠</span><span class="font-bold text-[9px] text-white mt-1 uppercase">Instalar</span>
+        </button>
+        <button onclick="abrirModal('modalReparacion')" class="btn-repair p-4 rounded-2xl shadow-lg flex flex-col items-center">
+            <span class="text-xl">🛠️</span><span class="font-bold text-[9px] text-white mt-1 uppercase">Soporte</span>
+        </button>
+        <button onclick="abrirModal('modalInventario')" class="btn-inv p-4 rounded-2xl shadow-lg flex flex-col items-center">
+            <span class="text-xl">📦</span><span class="font-bold text-[9px] text-white mt-1 uppercase">Stock</span>
+        </button>
+    </div>
+
+    <button onclick="generarCierreJornada()" class="w-full btn-gold p-4 rounded-2xl shadow-lg flex items-center justify-center gap-3 mb-6">
+        <span class="font-black text-xs text-white uppercase tracking-widest text-white">📊 Generar Cierre de Jornada</span>
+    </button>
+
+    <div class="glass-card p-3 rounded-2xl mb-6 grid grid-cols-4 gap-2 text-center border-dashed border-sky-500/30">
+        <div><p class="text-[7px] text-slate-500 uppercase">Drop</p><p id="st-drop" class="text-xs font-bold text-sky-400">0</p></div>
+        <div><p class="text-[7px] text-slate-500 uppercase">ONT</p><p id="st-ont" class="text-xs font-bold text-sky-400">0</p></div>
+        <div><p class="text-[7px] text-slate-500 uppercase">Patch</p><p id="st-pat" class="text-xs font-bold text-sky-400">0</p></div>
+        <div><p class="text-[7px] text-slate-500 uppercase">Tirrap</p><p id="st-tir" class="text-xs font-bold text-sky-400">0</p></div>
+    </div>
+
+    <div class="flex justify-between items-center mb-4 px-1">
+        <h2 class="text-xs font-black text-slate-500 uppercase tracking-widest italic text-white">Historial de Hoy</h2>
+        <button onclick="borrarTodo()" class="text-[10px] text-red-400 font-bold uppercase underline">Borrar Todo</button>
+    </div>
+    
+    <div id="listaGeneral" class="space-y-3"></div>
+    <div id="emptyState" class="text-center py-10 text-slate-600 italic text-sm text-white">No hay reportes hoy.</div>
+
+    <div id="modalInventario" class="fixed inset-0 bg-slate-950/98 hidden z-50 overflow-y-auto p-4">
+        <div class="glass-card w-full max-w-md mx-auto rounded-3xl p-6">
+            <h3 class="text-lg font-bold text-white uppercase mb-4 text-center">Carga de Materiales</h3>
+            <div class="grid grid-cols-2 gap-3 text-white">
+                <div><label class="label-style">Drop (Mts)</label><input id="inv_drop" type="number"></div>
+                <div><label class="label-style">Tensores</label><input id="inv_ten" type="number"></div>
+                <div><label class="label-style">Conectores</label><input id="inv_con" type="number"></div>
+                <div><label class="label-style">ONTs</label><input id="inv_ont" type="number"></div>
+                <div><label class="label-style">Patch Cord</label><input id="inv_pat" type="number"></div>
+                <div><label class="label-style">Rosetas</label><input id="inv_ros" type="number"></div>
+                <div><label class="label-style">Tirraps</label><input id="inv_tir" type="number"></div>
+            </div>
+            <button onclick="guardarInventario()" class="w-full btn-inv py-4 rounded-xl font-bold uppercase mt-6 text-white">Guardar Stock</button>
+            <button onclick="cerrarModal('modalInventario')" class="w-full text-slate-500 text-[10px] py-4 uppercase font-bold text-white">Cerrar</button>
+        </div>
+    </div>
+
+    <div id="modalInstalacion" class="fixed inset-0 bg-slate-950/98 hidden z-50 overflow-y-auto p-4">
+        <div class="glass-card w-full max-w-md mx-auto rounded-3xl p-6">
+            <h2 class="text-center font-black text-sky-400 mb-4 uppercase text-white">Datos Instalación</h2>
+            <div class="space-y-2">
+                <label class="label-style">Nombres Apellido</label><input id="in_cli" placeholder="Jashel Sotillo">
+                <div class="grid grid-cols-2 gap-2">
+                    <div><label class="label-style">Número ODS</label><input id="in_ods"></div>
+                    <div><label class="label-style">Customer ID</label><input id="in_cid"></div>
+                </div>
+                <label class="label-style">Caja NAP</label><input id="in_nap">
+                <div class="grid grid-cols-2 gap-2">
+                    <div><label class="label-style">Pto Uso</label><input id="in_p_u"></div>
+                    <div><label class="label-style">Ptos Disp.</label><input id="in_p_d"></div>
+                </div>
+                <label class="label-style">Plan Contratado</label><input id="in_plan">
+                <div class="grid grid-cols-3 gap-2 text-white">
+                    <div><label class="label-style">Drop</label><input id="in_drop" type="number"></div>
+                    <div><label class="label-style">Tens.</label><input id="in_ten" type="number" value="2"></div>
+                    <div><label class="label-style">Conect.</label><input id="in_con" type="number" value="2"></div>
+                </div>
+                <div class="grid grid-cols-3 gap-2 text-white">
+                    <div><label class="label-style">Roseta</label><input id="in_ros" type="number" value="1"></div>
+                    <div><label class="label-style">Patch Cord</label><input id="in_pat" type="number" value="1"></div>
+                    <div><label class="label-style">Tirrap</label><input id="in_tir" type="number" value="1"></div>
+                </div>
+                <label class="label-style">MAC ONT</label><input id="in_mac">
+                <label class="label-style">Serial ONT</label><input id="in_sn">
+                <div class="grid grid-cols-2 gap-2">
+                    <div><label class="label-style">Cuadrilla</label><input id="in_cuad" value="C5"></div>
+                    <div><label class="label-style">Obs. Técnica</label><input id="in_obs" value="Navegando"></div>
+                </div>
+            </div>
+            <div class="mt-6 space-y-2 text-white">
+                <button onclick="procesar('inst', true)" class="w-full btn-install py-4 rounded-xl font-bold uppercase">WhatsApp</button>
+                <button onclick="procesar('inst', false)" class="w-full glass-card py-3 rounded-xl font-bold text-sky-400 uppercase text-xs">Copiar Formato</button>
+                <button onclick="cerrarModal('modalInstalacion')" class="w-full text-slate-500 text-[10px] py-2 uppercase font-bold text-center">Cerrar</button>
+            </div>
+        </div>
+    </div>
+
+    <div id="modalReparacion" class="fixed inset-0 bg-slate-950/98 hidden z-50 overflow-y-auto p-4">
+        <div class="glass-card w-full max-w-md mx-auto rounded-3xl p-6">
+            <h2 class="text-center font-black text-amber-500 mb-4 uppercase text-white">Soporte Técnico</h2>
+            <div class="space-y-2">
+                <label class="label-style">ID Servicio Largo</label><input id="re_id_full" placeholder="SIMPLETV-SIMPLETV-06097643">
+                <label class="label-style">Customer ID</label><input id="re_cid">
+                <label class="label-style">Nombre y Apellido</label><input id="re_cli">
+                <label class="label-style">Falla Encontrada</label><input id="re_falla">
+                <label class="label-style">Solución</label><input id="re_sol">
+                <label class="label-style">Materiales Usados</label><input id="re_mat" placeholder="PACH CORD: 01 ONT: 1">
+                <div class="grid grid-cols-2 gap-2">
+                    <div><label class="label-style">Pto NAP</label><input id="re_pto"></div>
+                    <div><label class="label-style">Caja NAP</label><input id="re_nap"></div>
+                </div>
+                <label class="label-style">Coordenadas</label><input id="re_coo">
+                <div class="grid grid-cols-2 gap-2">
+                    <div><label class="label-style">MAC Retiró</label><input id="re_mac"></div>
+                    <div><label class="label-style">Serial Retiró</label><input id="re_sn"></div>
+                </div>
+                <label class="label-style">Observaciones</label><input id="re_obs">
+            </div>
+            <div class="mt-6 space-y-2 text-white">
+                <button onclick="procesar('rep', true)" class="w-full btn-repair py-4 rounded-xl font-bold uppercase">WhatsApp</button>
+                <button onclick="procesar('rep', false)" class="w-full glass-card py-3 rounded-xl font-bold text-amber-500 uppercase text-xs">Copiar Formato</button>
+                <button onclick="cerrarModal('modalReparacion')" class="w-full text-slate-500 text-[10px] py-2 uppercase font-bold text-center">Cerrar</button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        let registros = JSON.parse(localStorage.getItem('wf_v4_2_regs')) || [];
+        let stock = JSON.parse(localStorage.getItem('wf_v4_2_stock')) || { drop: 0, ten: 0, con: 0, ont: 0, pat: 0, ros: 0, tir: 0 };
+
+        function abrirModal(id) { document.getElementById(id).classList.remove('hidden'); }
+        function cerrarModal(id) { document.getElementById(id).classList.add('hidden'); }
+
+        function guardarInventario() {
+            stock = {
+                drop: Number(document.getElementById('inv_drop').value), ten: Number(document.getElementById('inv_ten').value),
+                con: Number(document.getElementById('inv_con').value), ont: Number(document.getElementById('inv_ont').value),
+                pat: Number(document.getElementById('inv_pat').value), ros: Number(document.getElementById('inv_ros').value),
+                tir: Number(document.getElementById('inv_tir').value)
+            };
+            localStorage.setItem('wf_v4_2_stock', JSON.stringify(stock));
+            actualizarVista(); cerrarModal('modalInventario');
+        }
+
+        function actualizarVista() {
+            document.getElementById('st-drop').innerText = stock.drop + "m";
+            document.getElementById('st-ont').innerText = stock.ont;
+            document.getElementById('st-pat').innerText = stock.pat;
+            document.getElementById('st-tir').innerText = stock.tir;
+            const l = document.getElementById('listaGeneral');
+            const e = document.getElementById('emptyState');
+            if(registros.length === 0) { l.innerHTML = ''; e.classList.remove('hidden'); return; }
+            e.classList.add('hidden');
+            l.innerHTML = [...registros].reverse().map(r => `
+                <div class="glass-card p-4 rounded-2xl border-l-4 ${r.tipo === 'inst' ? 'border-sky-500' : 'border-amber-500'} flex justify-between items-center">
+                    <div class="flex-1">
+                        <p class="font-bold text-sm text-white">${r.cli}</p>
+                        <p class="text-[9px] text-slate-400 uppercase font-bold tracking-tight">${r.tipo === 'inst' ? '🏠 INSTALACIÓN' : '🛠 SOPORTE'} | ${r.id}</p>
+                        ${r.co ? `<button onclick="window.open('http://googleusercontent.com/?q=${r.co}')" class="mt-2 text-[8px] bg-amber-500/20 text-amber-500 px-3 py-1 rounded font-black">📍 VER MAPA</button>` : ''}
+                    </div>
+                    <p class="text-[10px] text-slate-500 font-bold">${r.hora}</p>
+                </div>
+            `).join('');
+        }
+
+        function procesar(tipo, esWhatsApp) {
+            let txt = ""; let cli = ""; let id = ""; let co = "";
+            const fecha = new Date().toLocaleDateString('es-ES');
+            const hora = new Date().toLocaleTimeString('en-US', {hour:'numeric', minute:'2-digit', hour12:true});
+
+            if(tipo === 'inst') {
+                const d = {
+                    cli: document.getElementById('in_cli').value, ods: document.getElementById('in_ods').value,
+                    cid: document.getElementById('in_cid').value, nap: document.getElementById('in_nap').value,
+                    pu: document.getElementById('in_p_u').value, pd: document.getElementById('in_p_d').value,
+                    pl: document.getElementById('in_plan').value, dr: Number(document.getElementById('in_drop').value),
+                    te: Number(document.getElementById('in_ten').value), co: Number(document.getElementById('in_con').value),
+                    ro: Number(document.getElementById('in_ros').value), pa: Number(document.getElementById('in_pat').value),
+                    ti: Number(document.getElementById('in_tir').value), mac: document.getElementById('in_mac').value.toUpperCase(),
+                    sn: document.getElementById('in_sn').value.toUpperCase(), cu: "C5",
+                    ob: document.getElementById('in_obs').value
+                };
+                if(!d.cli) return alert("Nombre obligatorio");
+                txt = `DATOS INSTALACION\nFECHA DE INSTALACION\n${fecha}\nNUMERO ODS:${d.ods}\nCUSTOMER ID: ${d.cid}\nNOMBRES APELLIDO :${d.cli}\nCAJA NAP:${d.nap}\nPUERTO UTILIZADA:${d.pu}\nPUERTOS DISPONIBLES: ${d.pd}\nPLAN CONTRATADO: ${d.pl}\nDROP NEGRO:${d.dr}\nTENSORES: ${d.te}\nCONECTORES: ${d.co}\nROSETAS: ${d.ro}\nPACH CORD: 0${d.pa}\nMAC ONT: ${d.mac}\nSERIAL ONT:${d.sn}\nTIRRAP: ${d.ti}\nCUADRILLA: ${d.cu}\nOBSERVACIÓN TECNICA: ${d.ob}`;
+                cli = d.cli; id = d.ods;
+                if(esWhatsApp) {
+                    stock.drop -= d.dr; stock.ten -= d.te; stock.con -= d.co; stock.ros -= d.ro; stock.pat -= d.pa; stock.tir -= d.ti; stock.ont -= 1;
+                }
+            } else {
+                const d = {
+                    full: document.getElementById('re_id_full').value, cid: document.getElementById('re_cid').value,
+                    cli: document.getElementById('re_cli').value, fa: document.getElementById('re_falla').value,
+                    sol: document.getElementById('re_sol').value, mat: document.getElementById('re_mat').value,
+                    pto: document.getElementById('re_pto').value, na: document.getElementById('re_nap').value,
+                    coo: document.getElementById('re_coo').value, mac: document.getElementById('re_mac').value.toUpperCase(),
+                    sn: document.getElementById('re_sn').value.toUpperCase(), ob: document.getElementById('re_obs').value
+                };
+                if(!d.cli) return alert("Nombre obligatorio");
+                txt = `* ${d.full}\n* CUSTOMER ID: ${d.cid}\n* Nombre y apellido: ${d.cli}\n* Cuadrilla: C5\n* Fecha y hora del servicio realizado: ${fecha} hora ${hora}\n* Falla encontrada: ${d.fa}\n* Solución de la misma (dar breve descripción): ${d.sol}\n* Material usados (cantidad específica de cada material): ${d.mat}\n* Puerto en caja nap utilizado: ${d.pto}\n* Caja nap utilizada (Nomenclatura): ${d.na}\n* Coordenadas de la caja NAP: ${d.coo}\n* Equipo de retiró aplica): mac: ${d.mac}\n* Seríal: ${d.sn}\n* Observaciones: ${d.ob}`;
+                cli = d.cli; id = d.full; co = d.coo;
+            }
+
+            if(esWhatsApp) {
+                registros.push({ cli, id, tipo, co, hora: new Date().toLocaleTimeString([], {hour:'2-digit', minute:'2-digit'}) });
+                localStorage.setItem('wf_v4_2_regs', JSON.stringify(registros));
+                localStorage.setItem('wf_v4_2_stock', JSON.stringify(stock));
+                window.open(`https://wa.me/?text=${encodeURIComponent(txt)}`, '_blank');
+                actualizarVista(); cerrarModal(tipo === 'inst' ? 'modalInstalacion' : 'modalReparacion');
+            } else {
+                navigator.clipboard.writeText(txt); alert("Formato Copiado");
+            }
+        }
+
+        function generarCierreJornada() {
+            if(registros.length === 0) return alert("Sin datos");
+            let d=0, t=0, c=0, o=0, p=0, r=0, ti=0, list="";
+            registros.forEach((reg, i) => {
+                list += `${i+1}. ${reg.cli} (${reg.id})\n`;
+                if(reg.tipo === 'inst') o++;
+            });
+            const cierre = `📊 *CIERRE C5*\n\n✅ *TRABAJOS:* ${registros.length}\n${list}\n📉 *STOCK ACTUAL:*\n• DROP: ${stock.drop}m\n• ONT: ${stock.ont}\n• TENS: ${stock.ten}\n• CON: ${stock.con}\n• ROS: ${stock.ros}\n• TIRRAP: ${stock.tir}`;
+            window.open(`https://wa.me/?text=${encodeURIComponent(cierre)}`, '_blank');
+        }
+
+        function borrarTodo() { if(confirm("¿Seguro quieres borrar el historial y stock?")) { registros=[]; localStorage.clear(); location.reload(); } }
+        actualizarVista();
+    </script>
+</body>
+</html>
